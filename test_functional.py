@@ -1,5 +1,3 @@
-
-
 def test_python_org(browser):
     browser.get("http://www.google.com")
     if not "Google" in browser.title:
