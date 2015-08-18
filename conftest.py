@@ -15,6 +15,7 @@ def browser(request):
         command_executor = WEBDRIVER_ENDPOINT,
         desired_capabilities = {
         	'browserName': 'chrome',
+        	'version': 41,
         	'platform': 'XP'
         }
     )
