@@ -1,3 +1,9 @@
+import os
+import unittest
+import sys
+import new
+from selenium import webdriver
+
 browsers = [{
       "platform": "Linux",
       "browserName": "chrome",
@@ -16,15 +22,18 @@ browsers = [{
       "version": "33.0"
   }]
 
+username = os.environ['SAUCE_USERNAME']
+access_key = os.environ['SAUCE_ACCESS_KEY']
+
 # This decorator is required to iterate over browsers
 def on_platforms(platforms):
     def decorator(base_class):
         module = sys.modules[base_class.__module__].__dict__
         for i, platform in enumerate(platforms):
-        d = dict(base_class.__dict__)
-        d['desired_capabilities'] = platform
-        name = "%s_%s" % (base_class.__name__, i + 1)
-        module[name] = new.classobj(name, (base_class,), d)
+            d = dict(base_class.__dict__)
+            d['desired_capabilities'] = platform
+            name = "%s_%s" % (base_class.__name__, i + 1)
+            module[name] = new.classobj(name, (base_class,), d)
     return decorator
 
 @on_platforms(browsers)
@@ -33,7 +42,7 @@ class FirstSampleTest(unittest.TestCase):
     def setUp(self):
         self.desired_capabilities['name'] = self.id()
         self.driver = webdriver.Remote(
-           command_executor="http://%s:%s@ondemand.saucelabs.com:80/wd/hub" % ("ndmanvar", "c4b0109c-8bb4-4ed9-a162-b77ab58e2650"),
+           command_executor="http://%s:%s@ondemand.saucelabs.com:80/wd/hub" % (username, access_key),
            desired_capabilities=self.desired_capabilities)
         self.driver.implicitly_wait(30)
 
