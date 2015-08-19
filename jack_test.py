@@ -47,20 +47,13 @@ class FirstSampleTest(unittest.TestCase):
         self.driver.implicitly_wait(30)
 
 # This is your test logic. You can add multiple tests here.
-    def test_google    (self):
+    def test_google(self):
         self.driver.get("http://www.google.com")
         if not "Google" in self.driver.title:
             raise Exception("Unable to load google page!")
         elem = self.driver.find_element_by_name("q")
         elem.send_keys("Sauce Labs")
         elem.submit()
-        print self.driver.title
-
-    def test_amazon(self):
-        self.driver.get("http://www.amazon.com")
-        if not "Amazon.com" in self.driver.title:
-            raise Exception("Unable to load amazon page!")
-        print self.driver.title        
 
     def tearDown(self):
         # This is where you tell Sauce Labs to stop running tests on your behalf.  
