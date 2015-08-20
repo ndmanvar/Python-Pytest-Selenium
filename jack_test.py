@@ -3,24 +3,26 @@ import unittest
 import sys
 import new
 from selenium import webdriver
+from sauceclient import SauceClient
 
 browsers = [{
       "platform": "Linux",
       "browserName": "chrome",
       "version": "31"
-  }, {
+    },
+    {
       "platform": "Windows 8.1",
       "browserName": "internet explorer",
       "version": "11"
-  }, {
+    }, {
       "platform": "OS X 10.9",
       "browserName": "safari",
       "version": "7.0"
-  }, {
+    }, {
       "platform": "Windows 7",
       "browserName": "chrome",
       "version": "33.0"
-  }]
+    }]
 
 username = os.environ['SAUCE_USERNAME']
 access_key = os.environ['SAUCE_ACCESS_KEY']
@@ -59,3 +61,12 @@ class FirstSampleTest(unittest.TestCase):
         # This is where you tell Sauce Labs to stop running tests on your behalf.  
         # It is important so that you aren't billed after your test finishes.
         self.driver.quit()
+
+        sauce_client = SauceClient(username, access_key)
+
+        if sys.exc_info() == (None, None, None):
+            ok = True
+        else:
+            ok = False
+
+        sauce_client.jobs.update_job(self.driver.session_id, passed=ok)
