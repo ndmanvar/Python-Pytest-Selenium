@@ -6,10 +6,7 @@
 ```
 
 # Setup
-install selenium: `pip install selenium  # use sudo if necessary`
-install sauceclient: `pip install sauceclient  # use sudo if necessary`
-install pytest: `pip install pytest  # use sudo if necessary`
-install pytest-xdist: `pip install pytest-xtest  # use sudo if necessary`
+`pip install selenium sauceclient pytest pytest-xdist  # use sudo if necessary`
 
 # Running tests
 to run tests: `py.test -n 10`

@@ -51,5 +51,5 @@ class FirstSampleTest(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
         sauce_client = SauceClient(username, access_key)
-        has_passed = (sys.exc_info() == (None, None, None))
-        sauce_client.jobs.update_job(self.driver.session_id, passed=has_passed)
+        status = (sys.exc_info() == (None, None, None))
+        sauce_client.jobs.update_job(self.driver.session_id, passed=status)
