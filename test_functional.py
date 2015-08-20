@@ -1,32 +1,55 @@
-import unittest
 import os
-import pytest
+import unittest
+import sys
+import new
 from selenium import webdriver
+from sauceclient import SauceClient
 
-class GoogleTest(unittest.TestCase):
+browsers = [{
+    "platform": "Windows 10",
+    "browserName": "internet explorer",
+    "version": "11"
+}, {
+    "platform": "OS X 10.11",
+    "browserName": "safari",
+    "version": "8.1"
+}]
 
+username = os.environ['SAUCE_USERNAME']
+access_key = os.environ['SAUCE_ACCESS_KEY']
+
+# This decorator is required to iterate over browsers
+def on_platforms(platforms):
+    def decorator(base_class):
+        module = sys.modules[base_class.__module__].__dict__
+        for i, platform in enumerate(platforms):
+            d = dict(base_class.__dict__)
+            d['desired_capabilities'] = platform
+            name = "%s_%s" % (base_class.__name__, i + 1)
+            module[name] = new.classobj(name, (base_class,), d)
+    return decorator
+
+@on_platforms(browsers)
+class FirstSampleTest(unittest.TestCase):
+
+    # setUp runs before each test case
     def setUp(self):
-        username = os.environ['SAUCE_USERNAME']
-        access_key = os.environ['SAUCE_ACCESS_KEY']
-
-        capabilities = {
-            'platform': "XP",
-            'browserName': "chrome",
-            'version': "31",
-            'name': self.id()
-        }
+        self.desired_capabilities['name'] = self.id()
         self.driver = webdriver.Remote(
-            command_executor = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub" % (username, access_key),
-            desired_capabilities = capabilities)
+           command_executor="http://%s:%s@ondemand.saucelabs.com:80/wd/hub" % (username, access_key),
+           desired_capabilities=self.desired_capabilities)
 
-    def tearDown(self):
-        self.driver.quit()
-
+    # Test google title
     def test_google(self):
-        driver = self.driver
-        driver.get("http://www.google.com")
-        if not "Google" in driver.title:
-            raise Exception("Unable to load google page!")
-        elem = driver.find_element_by_name("q")
+        self.driver.get("http://www.google.com")
+        assert ("Google" in self.driver.title), "Unable to load google page"
+        elem = self.driver.find_element_by_name("q")
         elem.send_keys("Sauce Labs")
         elem.submit()
+
+    # tearDown runs after each test case
+    def tearDown(self):
+        self.driver.quit()
+        sauce_client = SauceClient(username, access_key)
+        has_passed = (sys.exc_info() == (None, None, None))
+        sauce_client.jobs.update_job(self.driver.session_id, passed=has_passed)
