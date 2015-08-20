@@ -39,10 +39,14 @@ class FirstSampleTest(unittest.TestCase):
            command_executor="http://%s:%s@ondemand.saucelabs.com:80/wd/hub" % (username, access_key),
            desired_capabilities=self.desired_capabilities)
 
-    # Test google title
+    # verify google title
     def test_google(self):
         self.driver.get("http://www.google.com")
         assert ("Google" in self.driver.title), "Unable to load google page"
+
+    # type 'Sauce Labs' into google search box and submit
+    def test_google_search(self):
+        self.driver.get("http://www.google.com")
         elem = self.driver.find_element_by_name("q")
         elem.send_keys("Sauce Labs")
         elem.submit()
