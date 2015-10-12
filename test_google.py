@@ -17,6 +17,7 @@ browsers = [{
 
 username = os.environ['SAUCE_USERNAME']
 access_key = os.environ['SAUCE_ACCESS_KEY']
+log_output = os.environ['LOG_OUTPUT']
 
 # This decorator is required to iterate over browsers
 def on_platforms(platforms):
@@ -28,6 +29,11 @@ def on_platforms(platforms):
             name = "%s_%s" % (base_class.__name__, i + 1)
             module[name] = new.classobj(name, (base_class,), d)
     return decorator
+
+def log_to_file(data):
+    if log_output:
+        with open("result_log.txt", "a") as f:
+            f.write(data + "\n")
 
 @on_platforms(browsers)
 class FirstSampleTest(unittest.TestCase):
@@ -54,6 +60,10 @@ class FirstSampleTest(unittest.TestCase):
     # tearDown runs after each test case
     def tearDown(self):
         self.driver.quit()
+        session_id = self.driver.session_id
+        job_name = self.id()
         sauce_client = SauceClient(username, access_key)
         status = (sys.exc_info() == (None, None, None))
-        sauce_client.jobs.update_job(self.driver.session_id, passed=status)
+        sauce_client.jobs.update_job(session_id, passed=status)
+        output = "SauceOnDemandSessionID=%s job-name=%s" % (session_id, job_name)
+        log_to_file(output)
