@@ -29,6 +29,10 @@ def on_platforms(platforms):
             module[name] = new.classobj(name, (base_class,), d)
     return decorator
 
+def log_to_file(data):
+    with open("result_log.txt", "a") as file:
+        file.write(data + "\n")
+
 @on_platforms(browsers)
 class FirstSampleTest(unittest.TestCase):
 
@@ -54,6 +58,17 @@ class FirstSampleTest(unittest.TestCase):
     # tearDown runs after each test case
     def tearDown(self):
         self.driver.quit()
+        session_id = self.driver.session_id
+        job_name = self.id()
         sauce_client = SauceClient(username, access_key)
         status = (sys.exc_info() == (None, None, None))
-        sauce_client.jobs.update_job(self.driver.session_id, passed=status)
+        sauce_client.jobs.update_job(session_id, passed=status)
+        output = "SauceOnDemandSessionID=%s job-name=%s" % (session_id, job_name)
+        log_to_file(output)
+
+
+
+
+
+
+
