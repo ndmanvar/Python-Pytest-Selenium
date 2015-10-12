@@ -17,6 +17,7 @@ browsers = [{
 
 username = os.environ['SAUCE_USERNAME']
 access_key = os.environ['SAUCE_ACCESS_KEY']
+log_output = os.environ['LOG_OUTPUT']
 
 # This decorator is required to iterate over browsers
 def on_platforms(platforms):
@@ -30,8 +31,9 @@ def on_platforms(platforms):
     return decorator
 
 def log_to_file(data):
-    with open("result_log.txt", "a") as file:
-        file.write(data + "\n")
+    if log_output:
+        with open("result_log.txt", "a") as f:
+            f.write(data + "\n")
 
 @on_platforms(browsers)
 class FirstSampleTest(unittest.TestCase):
@@ -65,10 +67,3 @@ class FirstSampleTest(unittest.TestCase):
         sauce_client.jobs.update_job(session_id, passed=status)
         output = "SauceOnDemandSessionID=%s job-name=%s" % (session_id, job_name)
         log_to_file(output)
-
-
-
-
-
-
-
